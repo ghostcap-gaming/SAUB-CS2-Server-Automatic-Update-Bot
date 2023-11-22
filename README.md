@@ -34,6 +34,9 @@ I originally created this for my own community and clients of [Game Host Bros](h
 
 Once configured, you simply leave the bot running. It will periodically check every 5 minutes for Counter Strike 2 updates and perform restarts as needed.
 
+## Known Issues
+- The initial check is very lenient for now while testing so it wont stop the bot from running if it can't access an API. 
+
 ## Support
 
 This bot is still a work in progress. Please open an issue if you find a bug. I'm open to contributions on the project but only to enhance existing features or updates as I want to keep it simple for people to use.
