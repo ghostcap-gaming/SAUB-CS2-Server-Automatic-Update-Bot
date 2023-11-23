@@ -25,6 +25,7 @@ const config = {
   serverUuids: credentials.SERVER_UUIDS.split(','),
   discordWebhookUrl: credentials.DISCORD_WEBHOOK_URL,
   panelDomain: credentials.PANEL_DOMAIN,
+  panelType: credentials.PANEL_TYPE,
 };
 
 let latestNewsId = '';
@@ -47,23 +48,33 @@ try {
 async function initialChecks() {
   console.log('Performing initial checks...');
 
+  if (!config.steamApiKey || config.steamApiKey.trim() === '') {
+    console.error('No Steam API key provided. Please provide a valid Steam API key.');
+    return false;
+  }
+
   let failedUuids = [];
 
   try {
-    const steamApiResponse = await axios.get('http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=730&count=1&maxlength=300&format=json');
+    const steamApiResponse = await axios.get(`http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=730&count=1&maxlength=300&format=json&key=${config.steamApiKey}`);
     if (!steamApiResponse.data.appnews || steamApiResponse.data.appnews.newsitems.length === 0) {
-      throw new Error('No response from Steam News API.');
+      throw new Error('Failed to get a response from Steam News API. Please check the Steam API key.');
     }
 
     for (const serverUuid of config.serverUuids) {
       try {
-        await axios.get(`${config.panelDomain}/api/client/servers/${serverUuid}/resources`, {
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/vnd.wisp.v1+json',
-            'Authorization': `Bearer ${config.panelApiKey}`,
-          },
-        });
+        let headers = {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${config.panelApiKey}`,
+        };
+
+        if (config.panelType === 'WISP') {
+          headers['Accept'] = 'application/vnd.wisp.v1+json';
+        } else if (config.panelType === 'PTERODACTYL') {
+          headers['Accept'] = 'application/json';
+        }
+
+        await axios.get(`${config.panelDomain}/api/client/servers/${serverUuid}/resources`, { headers });
       } catch (error) {
         console.error(`Error querying server with UUID ${serverUuid}:`, error.message);
         failedUuids.push(serverUuid);
@@ -130,33 +141,37 @@ async function checkForSteamUpdates() {
 
 async function restartServer(serverUuid) {
   try {
-    const powerStatusResponse = await axios.get(`${config.panelDomain}/api/client/servers/${serverUuid}/resources`, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/vnd.wisp.v1+json',
-        'Authorization': `Bearer ${config.panelApiKey}`,
-      },
-    });
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${config.panelApiKey}`,
+    };
 
-    const powerStatus = powerStatusResponse.data.status;
+    if (config.panelType === 'WISP') {
+      headers['Accept'] = 'application/vnd.wisp.v1+json';
+    } else if (config.panelType === 'PTERODACTYL') {
+      headers['Accept'] = 'application/json';
+    }
 
-    if (powerStatus === 1) {
+    const powerStatusResponse = await axios.get(`${config.panelDomain}/api/client/servers/${serverUuid}/resources`, { headers });
+
+    let isServerRunning = false;
+    if (config.panelType === 'WISP') {
+      isServerRunning = powerStatusResponse.data.status === 1;
+    } else if (config.panelType === 'PTERODACTYL') {
+      isServerRunning = powerStatusResponse.data.attributes.current_state === "running";
+    }
+
+    if (isServerRunning) {
       await axios.post(`${config.panelDomain}/api/client/servers/${serverUuid}/power`, {
         signal: 'restart',
-      }, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/vnd.wisp.v1+json',
-          'Authorization': `Bearer ${config.panelApiKey}`,
-        },
-      });
+      }, { headers });
 
       console.log(`Restart command sent to server with UUID: ${serverUuid}`);
     } else {
       console.log(`Server with UUID: ${serverUuid} is not running. No restart command sent.`);
     }
   } catch (error) {
-    console.error(`Error restarting server with UUID ${serverUuid}:`, error);
+    console.error(`UUID ${serverUuid} not found or not online, skipping.`);
   }
 }
 
@@ -166,17 +181,33 @@ async function performSteamUpdateChecks() {
     let serversToRestart = [];
 
     for (const serverUuid of config.serverUuids) {
-      const powerStatusResponse = await axios.get(`${config.panelDomain}/api/client/servers/${serverUuid}/resources`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/vnd.wisp.v1+json',
-          'Authorization': `Bearer ${config.panelApiKey}`,
-        },
-      });
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${config.panelApiKey}`,
+      };
 
-      if (powerStatusResponse.data.status === 1) {
-        await sendServerCommand(serverUuid, "say CS2 HAS JUST UPDATED, PLEASE REJOIN THE SERVER!");
-        serversToRestart.push(serverUuid);
+      if (config.panelType === 'WISP') {
+        headers['Accept'] = 'application/vnd.wisp.v1+json';
+      } else if (config.panelType === 'PTERODACTYL') {
+        headers['Accept'] = 'application/json';
+      }
+
+      try {
+        const powerStatusResponse = await axios.get(`${config.panelDomain}/api/client/servers/${serverUuid}/resources`, { headers });
+
+        let isServerRunning = false;
+        if (config.panelType === 'WISP') {
+          isServerRunning = powerStatusResponse.data.status === 1;
+        } else if (config.panelType === 'PTERODACTYL') {
+          isServerRunning = powerStatusResponse.data.attributes.current_state === "running";
+        }
+
+        if (isServerRunning) {
+          await sendServerCommand(serverUuid, "say CS2 HAS JUST UPDATED, PLEASE REJOIN THE SERVER!");
+          serversToRestart.push(serverUuid);
+        }
+      } catch (error) {
+        console.error(`Error checking server state for UUID ${serverUuid}: ${error.message}`);
       }
     }
 
@@ -196,12 +227,18 @@ async function performSteamUpdateChecks() {
 }
 
 async function sendServerCommand(serverUuid, command) {
-  const commandUrl = `${config.panelDomain}/api/client/servers/${serverUuid}/command`;
   const headers = {
     'Content-Type': 'application/json',
-    'Accept': 'application/vnd.wisp.v1+json',
     'Authorization': `Bearer ${config.panelApiKey}`,
   };
+
+  if (config.panelType === 'WISP') {
+    headers['Accept'] = 'application/vnd.wisp.v1+json';
+  } else if (config.panelType === 'PTERODACTYL') {
+    headers['Accept'] = 'application/json';
+  }
+
+  const commandUrl = `${config.panelDomain}/api/client/servers/${serverUuid}/command`;
   const data = { command };
 
   for (let i = 0; i < 2; i++) {
@@ -218,6 +255,7 @@ async function sendServerCommand(serverUuid, command) {
     await new Promise(resolve => setTimeout(resolve, 2000));
   }
 }
+
 
 async function sendDiscordWebhook(message) {
   if (!config.discordWebhookUrl) {

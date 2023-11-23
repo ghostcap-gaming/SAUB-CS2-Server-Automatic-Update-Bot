@@ -2,7 +2,7 @@
 
 ![Counter Strike 2 Update Bot](https://i.imgur.com/whIJ2k9.png)
 
-SAUB is a bot automates the update process for Counter Strike 2 servers running on Pterodactyl and WISP platforms. It checks Steam every 5 minutes for game updates, notifies the players in game and then restarts already running servers ensuring that your game servers are always up-to-date with the latest patches. Using the included eggs you can get the bot setup in just a few minutes with 0 coding knowledge required.
+SAUB is a bot automates the update process for Counter Strike 2 servers running on Pterodactyl and WISP platforms. It checks Steam every 5 minutes for game updates, notifies the players in game and then restarts already running servers ensuring that your game servers are always up-to-date with the latest patches. Using the included egg you can get the bot setup in just a few minutes with 0 coding knowledge.
 
 I originally created this for my own community and clients of [Game Host Bros](https://www.gamehostbros.com/) but I thought It would be valuable to lots of other communtites. There are other alternatives such as [this CounterStrikeSharp plugin](https://github.com/dran1x/CS2-AutoUpdater), but I wanted something that could run on both modded and vanilla servers. The exact method we use to check Steam is what we used to auto update our CSGO servers in the past and it was extremly reliable for us.
 
@@ -28,6 +28,7 @@ I originally created this for my own community and clients of [Game Host Bros](h
 - CS2 Server UUIDs: Seperate them using a comma. It should look like this: 79ec9628,45a32c57,85765369.
 - Discord Webhook (Optional): Create a webhook to notify the channel if an update comes out and what servers were restarted
 - Panel Domain: The URL should look like this - https://panel.gamehostbros.com - Make sure there is no trailing slash on the domain.
+- Panel Tyle: Using the drop down select either PTERODACTL or WISP.
 
  > [!IMPORTANT]  
  > I suggest you install this using 1 server UUID first as it will generate a .json file with the most recent update and trigger a restart on that server.
