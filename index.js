@@ -109,7 +109,7 @@ async function startApplication() {
     console.log('Checking for Steam updates...');
     await performSteamUpdateChecks();
     console.log('Steam update check complete.');
-  }, 300000);
+  }, 100000);
 }
 
 async function checkForSteamUpdates() {
@@ -140,18 +140,18 @@ async function checkForSteamUpdates() {
 }
 
 async function restartServer(serverUuid) {
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${config.panelApiKey}`,
+  };
+
+  if (config.panelType === 'WISP') {
+    headers['Accept'] = 'application/vnd.wisp.v1+json';
+  } else if (config.panelType === 'PTERODACTYL') {
+    headers['Accept'] = 'application/json';
+  }
+
   try {
-    const headers = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${config.panelApiKey}`,
-    };
-
-    if (config.panelType === 'WISP') {
-      headers['Accept'] = 'application/vnd.wisp.v1+json';
-    } else if (config.panelType === 'PTERODACTYL') {
-      headers['Accept'] = 'application/json';
-    }
-
     const powerStatusResponse = await axios.get(`${config.panelDomain}/api/client/servers/${serverUuid}/resources`, { headers });
 
     let isServerRunning = false;
@@ -166,14 +166,13 @@ async function restartServer(serverUuid) {
         signal: 'restart',
       }, { headers });
 
-      console.log(`Restart command sent to server with UUID: ${serverUuid}`);
-    } else {
-      console.log(`Server with UUID: ${serverUuid} is not running. No restart command sent.`);
     }
   } catch (error) {
-    console.error(`UUID ${serverUuid} not found or not online, skipping.`);
+    console.error(`Error restarting server with UUID ${serverUuid}:`, error.message);
   }
 }
+
+let serversRestartedForCurrentUpdate = new Set();
 
 async function performSteamUpdateChecks() {
   const updateDetected = await checkForSteamUpdates();
@@ -181,6 +180,11 @@ async function performSteamUpdateChecks() {
     let serversToRestart = [];
 
     for (const serverUuid of config.serverUuids) {
+      if (serversRestartedForCurrentUpdate.has(serverUuid)) {
+        console.log(`Server ${serverUuid} already restarted for this update. Skipping.`);
+        continue;
+      }
+
       const headers = {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${config.panelApiKey}`,
@@ -217,12 +221,16 @@ async function performSteamUpdateChecks() {
 
       for (const serverUuid of serversToRestart) {
         await restartServer(serverUuid);
-        console.log(`Steam update detected, restart command sent to server: ${serverUuid}`);
+        serversRestartedForCurrentUpdate.add(serverUuid);
       }
+
+      console.log(`All servers have been restarted for the update. Servers restarted: ${updatingServers}.`);
     } else {
       await sendDiscordWebhook(`Steam update detected. No servers currently running to restart.`);
       console.log(`Steam update detected, but no servers are currently running to restart.`);
     }
+  } else {
+    serversRestartedForCurrentUpdate.clear();
   }
 }
 
@@ -241,18 +249,18 @@ async function sendServerCommand(serverUuid, command) {
   const commandUrl = `${config.panelDomain}/api/client/servers/${serverUuid}/command`;
   const data = { command };
 
-  for (let i = 0; i < 2; i++) {
-    try {
-      const response = await axios.post(commandUrl, data, { headers });
-      if (response.status === 204) {
-        console.log(`Command sent to server ${serverUuid}: ${command}`);
-      } else {
-        console.log(`Failed to send command to server ${serverUuid}. Status: ${response.status}`);
-      }
-    } catch (error) {
-      console.error(`Error sending command to server ${serverUuid}:`, error.message);
+  try {
+    const delay = ms => new Promise(res => setTimeout(res, ms));
+    await delay(2000);
+
+    const response = await axios.post(commandUrl, data, { headers });
+    if (response.status === 204) {
+      console.log(`Command sent to server ${serverUuid}: ${command}`);
+    } else {
+      console.log(`Failed to send command to server ${serverUuid}. Status: ${response.status}`);
     }
-    await new Promise(resolve => setTimeout(resolve, 2000));
+  } catch (error) {
+    console.error(`Error sending command to server ${serverUuid}:`, error.message);
   }
 }
 
