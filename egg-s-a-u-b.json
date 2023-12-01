@@ -6,7 +6,7 @@
     },
     "exported_at": "2023-11-23T07:02:46+01:00",
     "name": "SAUB",
-    "author": "parker@parkervcp.com",
+    "author": "parker, pedrotski",
     "description": "CS2 Server Automatic Updater Bot",
     "features": null,
     "docker_images": {
