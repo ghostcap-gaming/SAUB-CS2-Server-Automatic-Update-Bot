@@ -1,6 +1,6 @@
 # SAUB - CS2 Server Automatic Update Bot for Pterodactyl & WISP
 
-![Counter Strike 2 Update Bot](https://i.imgur.com/whIJ2k9.png)
+![Counter Strike 2 Update Bot](https://i.imgur.com/7CfFMK2.png)
 
 SAUB is a bot automates the update process for Counter Strike 2 servers running on Pterodactyl and WISP platforms. It checks Steam every 5 minutes for game updates, notifies the players in game and then restarts already running servers ensuring that your game servers are always up-to-date with the latest patches. Using the included egg you can get the bot setup in just a few minutes with 0 coding knowledge.
 
