@@ -2,7 +2,7 @@
 
 ![Counter Strike 2 Update Bot](https://i.imgur.com/7CfFMK2.png)
 
-SAUB is a bot automates the update process for Counter Strike 2 servers running on Pterodactyl and WISP platforms. It checks Steam every 5 minutes for game updates, notifies the players in game and then restarts already running servers ensuring that your game servers are always up-to-date with the latest patches. Using the included egg you can get the bot setup in just a few minutes with 0 coding knowledge.
+SAUB is a bot automates the update process for Counter Strike 2 servers running on Pterodactyl or WISP. It checks Steam every 2 minutes for game updates, notifies the players in game and then restarts already running servers ensuring that your game servers are always up-to-date with the latest patches. Using the included egg you can get the bot setup in just a few minutes with 0 coding knowledge.
 
 I originally created this for my own community and clients of [Game Host Bros](https://www.gamehostbros.com/) but I thought It would be valuable to lots of other communtites. There are other alternatives such as [this CounterStrikeSharp plugin](https://github.com/dran1x/CS2-AutoUpdater), but I wanted something that could run on both modded and vanilla servers. The exact method we use to check Steam is what we used to auto update our CSGO servers in the past and it was extremly reliable for us.
 
