@@ -28,17 +28,18 @@ I originally created this for my own community and clients of [Game Host Bros](h
 - CS2 Server UUIDs: Seperate them using a comma. It should look like this: 79ec9628,45a32c57,85765369.
 - Discord Webhook (Optional): Create a webhook to notify the channel if an update comes out and what servers were restarted
 - Panel Domain: The URL should look like this - https://panel.gamehostbros.com - Make sure there is no trailing slash on the domain.
-- Panel Tyle: Using the drop down select either PTERODACTL or WISP.
+- Panel Type: Using the drop down select either PTERODACTL or WISP.
 
  > [!IMPORTANT]  
  > I suggest you install this using 1 server UUID first as it will generate a .json file with the most recent update and trigger a restart on that server.
 
 ## Usage
 
-Once configured, you simply leave the bot running. It will periodically check every 5 minutes for Counter Strike 2 updates and perform restarts as needed.
+Once configured, you simply leave the bot running. It will periodically check every ~2 minutes for Counter Strike 2 updates and perform restarts as needed. Please not that it doesnt update on every change that Valve releases for CS2, only the ones that will stop players connecting to your server.
 
 ## Known Issues
-- The initial check is very lenient for now while testing so it wont stop the bot from running if it can't access an API. 
+
+None
 
 ## Support
 
