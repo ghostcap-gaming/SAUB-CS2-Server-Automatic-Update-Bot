@@ -4,9 +4,9 @@
         "version": "PTDL_v2",
         "update_url": null
     },
-    "exported_at": "2023-11-23T07:02:46+01:00",
+    "exported_at": "2023-12-08T01:26:19+01:00",
     "name": "SAUB",
-    "author": "parker, pedrotski",
+    "author": "parker@parkervcp.com",
     "description": "CS2 Server Automatic Updater Bot",
     "features": null,
     "docker_images": {
@@ -142,16 +142,6 @@
             "user_viewable": true,
             "user_editable": true,
             "rules": "required|in:PTERODACTYL,WISP",
-            "field_type": "text"
-        },
-        {
-            "name": "Steam API Key",
-            "description": "Add your Steam developer API key.",
-            "env_variable": "STEAM_API_KEY",
-            "default_value": "",
-            "user_viewable": true,
-            "user_editable": true,
-            "rules": "nullable",
             "field_type": "text"
         },
         {

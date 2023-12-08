@@ -23,7 +23,6 @@ I originally created this for my own community and clients of [Game Host Bros](h
 2. Create a new server using the imported egg.
 3. Configure the server's startup variables.
 
-- Steam API Key: Get your Steam API key from here - https://steamcommunity.com/dev/apikey
 - Panel Client API Key: You can this from your user profile page in Pterodactyl or WISP.
 - CS2 Server UUIDs: Seperate them using a comma. It should look like this: 79ec9628,45a32c57,85765369.
 - Discord Webhook (Optional): Create a webhook to notify the channel if an update comes out and what servers were restarted

@@ -20,7 +20,6 @@ function readCredentials(file) {
 
 const credentials = readCredentials('credentials.cfg');
 const config = {
-  steamApiKey: credentials.STEAM_API_KEY,
   panelApiKey: credentials.PANEL_API_KEY,
   serverUuids: credentials.SERVER_UUIDS.split(','),
   discordWebhookUrl: credentials.DISCORD_WEBHOOK_URL,
@@ -47,11 +46,6 @@ try {
 
 async function initialChecks() {
   console.log('Performing initial checks...');
-
-  if (!config.steamApiKey || config.steamApiKey.trim() === '') {
-    console.error('No Steam API key provided. Please provide a valid Steam API key.');
-    return false;
-  }
 
   let failedUuids = [];
 
@@ -114,13 +108,14 @@ async function startApplication() {
 
 async function checkForSteamUpdates() {
   try {
-    const response = await axios.get('http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=730&count=3&maxlength=300&format=json');
+    const response = await axios.get('https://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=730&count=3&maxlength=300&format=json');
     const newsItems = response.data.appnews.newsitems;
 
     if (newsItems.length > 0) {
+      newsItems.sort((a, b) => b.date - a.date);
       const newestItem = newsItems[0];
 
-      if ((newestItem.gid !== latestNewsId || newestItem.date > latestNewsDate) && newestItem.tags.includes('patchnotes')) {
+      if (newestItem.gid !== latestNewsId && newestItem.date > latestNewsDate && newestItem.tags.includes('patchnotes')) {
         latestNewsId = newestItem.gid;
         latestNewsDate = newestItem.date;
 
@@ -138,6 +133,7 @@ async function checkForSteamUpdates() {
     return false;
   }
 }
+
 
 async function restartServer(serverUuid) {
   const headers = {
