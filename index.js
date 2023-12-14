@@ -108,14 +108,13 @@ async function startApplication() {
 
 async function checkForSteamUpdates() {
   try {
-    const response = await axios.get('https://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=730&count=3&maxlength=300&format=json');
+    const response = await axios.get('http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=730&count=1&maxlength=800&format=json');
     const newsItems = response.data.appnews.newsitems;
 
     if (newsItems.length > 0) {
-      newsItems.sort((a, b) => b.date - a.date);
       const newestItem = newsItems[0];
 
-      if (newestItem.gid !== latestNewsId && newestItem.date > latestNewsDate && newestItem.tags.includes('patchnotes')) {
+      if (newestItem.gid !== latestNewsId && newestItem.date > latestNewsDate) {
         latestNewsId = newestItem.gid;
         latestNewsDate = newestItem.date;
 
@@ -133,7 +132,6 @@ async function checkForSteamUpdates() {
     return false;
   }
 }
-
 
 async function restartServer(serverUuid) {
   const headers = {
