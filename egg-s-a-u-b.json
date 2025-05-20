@@ -135,16 +135,6 @@
             "field_type": "text"
         },
         {
-            "name": "Panel Type",
-            "description": "Select if your client API is WISP or Pterodactyl",
-            "env_variable": "PANEL_TYPE",
-            "default_value": "PTERODACTYL",
-            "user_viewable": true,
-            "user_editable": true,
-            "rules": "required|in:PTERODACTYL,WISP",
-            "field_type": "text"
-        },
-        {
             "name": "Panel Client API Key",
             "description": "Add your game panel client API key here. You can find this under your profile page.",
             "env_variable": "PANEL_API_KEY",
