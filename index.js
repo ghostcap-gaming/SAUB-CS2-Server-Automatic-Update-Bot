@@ -24,7 +24,6 @@ const config = {
   serverUuids: credentials.SERVER_UUIDS.split(','),
   discordWebhookUrl: credentials.DISCORD_WEBHOOK_URL,
   panelDomain: credentials.PANEL_DOMAIN,
-  panelType: credentials.PANEL_TYPE,
 };
 
 let latestNewsId = '';
@@ -57,16 +56,11 @@ async function initialChecks() {
 
     for (const serverUuid of config.serverUuids) {
       try {
-        let headers = {
+        const headers = {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${config.panelApiKey}`,
+          'Accept': 'application/json'
         };
-
-        if (config.panelType === 'WISP') {
-          headers['Accept'] = 'application/vnd.wisp.v1+json';
-        } else if (config.panelType === 'PTERODACTYL') {
-          headers['Accept'] = 'application/json';
-        }
 
         await axios.get(`${config.panelDomain}/api/client/servers/${serverUuid}/resources`, { headers });
       } catch (error) {
@@ -137,29 +131,17 @@ async function restartServer(serverUuid) {
   const headers = {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${config.panelApiKey}`,
+    'Accept': 'application/json'
   };
-
-  if (config.panelType === 'WISP') {
-    headers['Accept'] = 'application/vnd.wisp.v1+json';
-  } else if (config.panelType === 'PTERODACTYL') {
-    headers['Accept'] = 'application/json';
-  }
 
   try {
     const powerStatusResponse = await axios.get(`${config.panelDomain}/api/client/servers/${serverUuid}/resources`, { headers });
-
-    let isServerRunning = false;
-    if (config.panelType === 'WISP') {
-      isServerRunning = powerStatusResponse.data.status === 1;
-    } else if (config.panelType === 'PTERODACTYL') {
-      isServerRunning = powerStatusResponse.data.attributes.current_state === "running";
-    }
+    const isServerRunning = powerStatusResponse.data.attributes.current_state === "running";
 
     if (isServerRunning) {
       await axios.post(`${config.panelDomain}/api/client/servers/${serverUuid}/power`, {
         signal: 'restart',
       }, { headers });
-
     }
   } catch (error) {
     console.error(`Error restarting server with UUID ${serverUuid}:`, error.message);
@@ -182,23 +164,12 @@ async function performSteamUpdateChecks() {
       const headers = {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${config.panelApiKey}`,
+        'Accept': 'application/json'
       };
-
-      if (config.panelType === 'WISP') {
-        headers['Accept'] = 'application/vnd.wisp.v1+json';
-      } else if (config.panelType === 'PTERODACTYL') {
-        headers['Accept'] = 'application/json';
-      }
 
       try {
         const powerStatusResponse = await axios.get(`${config.panelDomain}/api/client/servers/${serverUuid}/resources`, { headers });
-
-        let isServerRunning = false;
-        if (config.panelType === 'WISP') {
-          isServerRunning = powerStatusResponse.data.status === 1;
-        } else if (config.panelType === 'PTERODACTYL') {
-          isServerRunning = powerStatusResponse.data.attributes.current_state === "running";
-        }
+        const isServerRunning = powerStatusResponse.data.attributes.current_state === "running";
 
         if (isServerRunning) {
           await sendServerCommand(serverUuid, "say CS2 HAS JUST UPDATED, PLEASE REJOIN THE SERVER!");
@@ -232,13 +203,8 @@ async function sendServerCommand(serverUuid, command) {
   const headers = {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${config.panelApiKey}`,
+    'Accept': 'application/json'
   };
-
-  if (config.panelType === 'WISP') {
-    headers['Accept'] = 'application/vnd.wisp.v1+json';
-  } else if (config.panelType === 'PTERODACTYL') {
-    headers['Accept'] = 'application/json';
-  }
 
   const commandUrl = `${config.panelDomain}/api/client/servers/${serverUuid}/command`;
   const data = { command };
@@ -257,7 +223,6 @@ async function sendServerCommand(serverUuid, command) {
     console.error(`Error sending command to server ${serverUuid}:`, error.message);
   }
 }
-
 
 async function sendDiscordWebhook(message) {
   if (!config.discordWebhookUrl) {
