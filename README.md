@@ -1,8 +1,8 @@
-# SAUB - CS2 Server Automatic Update Bot for Pterodactyl & WISP
+# SAUB - CS2 Server Automatic Update Bot for Pterodactyl
 
 ![Counter Strike 2 Update Bot](https://i.imgur.com/7CfFMK2.png)
 
-SAUB is a bot automates the update process for Counter Strike 2 servers running on Pterodactyl or WISP. It checks Steam every 2 minutes for game updates, notifies the players in game and then restarts already running servers ensuring that your game servers are always up-to-date with the latest patches. Using the included egg you can get the bot setup in just a few minutes with 0 coding knowledge.
+SAUB is a bot automates the update process for Counter Strike 2 servers running on Pterodactyl. It checks Steam every 2 minutes for game updates, notifies the players in game and then restarts already running servers ensuring that your game servers are always up-to-date with the latest patches. Using the included egg you can get the bot setup in just a few minutes with 0 coding knowledge.
 
 I originally created this for my own community and clients of [Game Host Bros](https://www.gamehostbros.com/) but I thought It would be valuable to lots of other communtites. There are other alternatives such as [this CounterStrikeSharp plugin](https://github.com/dran1x/CS2-AutoUpdater), but I wanted something that could run on both modded and vanilla servers. The exact method we use to check Steam is what we used to auto update our CSGO servers in the past and it was extremly reliable for us.
 
@@ -14,20 +14,20 @@ I originally created this for my own community and clients of [Game Host Bros](h
 - **Pre-Restart Notifications**: Sends customizable messages (twice so players don't miss it) to the game server before restarting, notifying players of impending updates.
 - **Discord Webhook Integration**: Sends notifications to a specified Discord channel about updates and server restarts.
 - **Server UUID Verification**: Validates the existence and status of servers before attempting to send commands or restart.
-- **Configurable via Startup Variables**: All settings are configurable through startup variables in Pterodactyl and WISP, eliminating the need for manual configuration file edits.
+- **Configurable via Startup Variables**: All settings are configurable through startup variables in Pterodactyl, eliminating the need for manual configuration file edits.
 - **Error Handling and Logging**: Provides detailed logs and handles errors gracefully, ensuring smooth operation.
 
 ## Installation
 
-1. Import the provided egg JSON file into your Pterodactyl or WISP panel.
+1. Import the provided egg JSON file into your Pterodactyl panel.
 2. Create a new server using the imported egg.
 3. Configure the server's startup variables.
 
-- Panel Client API Key: You can this from your user profile page in Pterodactyl or WISP.
+- Panel Client API Key: You can this from your user profile page in Pterodactyl.
 - CS2 Server UUIDs: Seperate them using a comma. It should look like this: 79ec9628,45a32c57,85765369.
 - Discord Webhook (Optional): Create a webhook to notify the channel if an update comes out and what servers were restarted
 - Panel Domain: The URL should look like this - https://panel.gamehostbros.com - Make sure there is no trailing slash on the domain.
-- Panel Type: Using the drop down select either PTERODACTL or WISP.
+- Panel Type: Using the drop down select either PTERODACTL.
 
  > [!IMPORTANT]  
  > I suggest you install this using 1 server UUID first as it will generate a .json file with the most recent update and trigger a restart on that server.
