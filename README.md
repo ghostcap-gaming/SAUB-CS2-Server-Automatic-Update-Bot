@@ -27,7 +27,6 @@ I originally created this for my own community and clients of [Game Host Bros](h
 - CS2 Server UUIDs: Seperate them using a comma. It should look like this: 79ec9628,45a32c57,85765369.
 - Discord Webhook (Optional): Create a webhook to notify the channel if an update comes out and what servers were restarted
 - Panel Domain: The URL should look like this - https://panel.gamehostbros.com - Make sure there is no trailing slash on the domain.
-- Panel Type: Using the drop down select either PTERODACTL.
 
  > [!IMPORTANT]  
  > I suggest you install this using 1 server UUID first as it will generate a .json file with the most recent update and trigger a restart on that server.
